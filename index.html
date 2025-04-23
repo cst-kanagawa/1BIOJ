@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生物の基礎用語確認　1年　ジェネレーター</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .question h3 {
+            margin: 0 0 10px 0;
+        }
+        .question label {
+            display: block;
+            margin-bottom: 5px;
+            position: relative;
+            padding-left: 25px; /* space for the feedback indicator */
+        }
+        .question-options {
+            margin-top: 10px;
+        }
+        .answer {
+            display: none;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        button {
+            margin-top: 20px;
+        }
+        .feedback {
+            margin-top: 10px;
+            color: red;
+        }
+        .correct {
+            color: green;
+        }
+        .incorrect {
+            color: red;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.5em; /* 大きなフォントサイズ */
+        }
+        .feedback-indicator {
+            position: absolute;
+            left: 0;
+            width: 20px;
+            text-align: center;
+        }
+        .correct-option .feedback-indicator::after {
+            content: "〇";
+            color: green;
+            font-weight: bold;
+        }
+        .incorrect-option .feedback-indicator::after {
+            content: "×";
+            color: red;
+            font-weight: bold;
+        }
+        .option-correct {
+            color: red;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>生物の基礎用語確認　1年　ジェネレーター</h1>
+    <div id="quiz"></div>
+    <button onclick="generateQuiz()">テストをリロード</button>
+    <button onclick="showAnswers()">答えを表示</button>
+    <div id="answers" class="answer"></div>
+    <div id="result" class="result"></div>
+
+    <script>
+        const questions = [
+  { "word": "目", "japanese": "ルーペで観察するとき，ルーペは（　　）に近づけて持ち，観察するものを前後に動かしてピントを合わせる。（　　）にあてはまる言葉は何か。" },
+  { "word": "100倍", "japanese": "接眼レンズが10×，対物レンズが10のとき，顕微鏡の倍率は何倍か。" },
+  { "word": "柱頭", "japanese": "めしべの花柱の先を何というか。" },
+  { "word": "子房", "japanese": "めしべの根もとのふくらんだ部分を何というか。" },
+  { "word": "胚珠", "japanese": "子房の中にある小さな粒を何というか。" },
+  { "word": "やく", "japanese": "おしべの先にある，花粉が入った袋を何というか。" },
+  { "word": "受粉", "japanese": "柱頭に花粉がつくことを何というか。" },
+  { "word": "果実", "japanese": "受粉が行われると，子房はやがて何になるか。" },
+  { "word": "種子植物", "japanese": "種子ができる植物を何というか。" },
+  { "word": "被子植物", "japanese": "アブラナやエンドウのように，胚珠が子房の中にある植物を何というか。" },
+  { "word": "裸子植物", "japanese": "マツやイチョウのように，子房がなく胚珠がむきだしになっている植物を何というか。" },
+  { "word": "光合成", "japanese": "植物が光のエネルギーを利用して，デンプンなどの養分をつくるはたらきを何というか。" },
+  { "word": "葉緑体", "japanese": "光合成が行われる，葉の細胞の中にある緑色の粒を何というか。" },
+  { "word": "呼吸", "japanese": "動物や植物が，空気中から酸素をとり入れて，空気中に二酸化炭素を出すはたらきを何というか。" },
+  { "word": "葉脈", "japanese": "葉に見られるすじのようなつくりを何というか。" },
+  { "word": "平行脈", "japanese": "葉脈が平行になっているつくりを何というか。" },
+  { "word": "網状脈", "japanese": "葉脈が網目状になっているつくりを何というか。" },
+  { "word": "気孔", "japanese": "葉の表皮にある細長い孔辺細胞に囲まれた穴を何というか。" },
+  { "word": "蒸散", "japanese": "植物が気孔から水を水蒸気として体の外に出す現象を何というか。" },
+  { "word": "道管", "japanese": "根から吸収された水や水に溶けた無機養分が通る管を何というか。" },
+  { "word": "師管", "japanese": "葉でつくられた養分が通る管を何というか。" },
+  { "word": "維管束", "japanese": "道管や師管の集まりを何というか。" },
+  { "word": "単子葉類", "japanese": "被子植物のうち，子葉が１枚のなかまを何というか。" },
+  { "word": "双子葉類", "japanese": "被子植物のうち，子葉が２枚のなかまを何というか。" },
+  { "word": "平行脈", "japanese": "被子植物の単子葉類のなかまの葉脈を（　　）という。（　　）にあてはまる言葉は何か。" },
+  { "word": "網状脈", "japanese": "被子植物の双子葉類のなかまの葉脈を（　　）という。（　　）にあてはまる言葉は何か。" },
+  { "word": "単子葉類", "japanese": "茎の維管束がばらばらに分布しているのは，被子植物の（　　）のなかまである。（　　）にあてはまる言葉は何か。" },
+  { "word": "双子葉類", "japanese": "茎の維管束が輪状に並んでいるのは，被子植物の（　　）のなかまである。（　　）にあてはまる言葉は何か。" },
+  { "word": "側根", "japanese": "双子葉類の根は，中心に太い根があり，そこから細い根がのびている。この細い根を何というか。" },
+  { "word": "ひげ根", "japanese": "単子葉類の根の形を何というか。" },
+  { "word": "合弁花類", "japanese": "双子葉類の中で，アサガオのように花弁がくっついている植物のなかまを何というか。" },
+  { "word": "離弁花類", "japanese": "合弁花類に対して，サクラのように花弁が離れている植物のなかまを何というか。" },
+  { "word": "胞子", "japanese": "イヌワラビやゼニゴケのように，種子をつくらない植物は，何をつくってなかまをふやすか。" },
+  { "word": "胞子のう", "japanese": "イヌワラビやゼニゴケなどの種子をつくらない植物で，胞子が入っている袋のようなものを何というか。" },
+  { "word": "シダ植物", "japanese": "イヌワラビやヘゴのなかまを何というか。" },
+  { "word": "ある。", "japanese": "シダ植物のなかまには，維管束があるか，ないか。" },
+  { "word": "根", "japanese": "シダ植物のなかまは，どの部分から水を吸収するか。" },
+  { "word": "コケ植物", "japanese": "ゼニゴケやスギゴケのなかまを何というか。" },
+  { "word": "ない。", "japanese": "コケ植物のなかまには，根・茎・葉の区別があるか，ないか。" },
+  { "word": "体の表面", "japanese": "コケ植物のなかまは，どの部分から水を吸収するか。" },
+  { "word": "種子植物", "japanese": "種子をつくり，なかまをふやす植物を何というか。" },
+  { "word": "被子植物", "japanese": "種子植物の中で，子房があるなかまを何というか。" },
+  { "word": "裸子植物", "japanese": "種子植物の中で，子房がないなかまを何というか。" },
+  { "word": "単子葉類", "japanese": "被子植物は，さらに双子葉類と（　　）に分けられる。（　　）にあてはまる言葉は何か。" }
+];
+
+        let userAnswers = [];
+        let difficultyMap = {}; // 正答率の低い問題を記録
+        let answerStats = {}; // 各答えの正答率を記録
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function getRandomQuestions(count) {
+            const shuffled = [...questions];
+            shuffle(shuffled);
+
+            // 正答率の低い問題を2倍にする
+            const weightedQuestions = [];
+            shuffled.forEach(q => {
+                const difficultyWeight = difficultyMap[q.word] || 1;
+                for (let i = 0; i < difficultyWeight; i++) {
+                    weightedQuestions.push(q);
+                }
+            });
+            shuffle(weightedQuestions);
+            return weightedQuestions.slice(0, count);
+        }
+
+        function generateOptions(correctAnswer, allOptions, optionType) {
+            const options = [];
+            const optionsCount = 4;
+
+            while (options.length < optionsCount - 1) {
+                const randomIndex = Math.floor(Math.random() * allOptions.length);
+                const option = optionType === 'japanese' ? allOptions[randomIndex].word : allOptions[randomIndex].japanese;
+                if (option !== correctAnswer && !options.includes(option)) {
+                    options.push(option);
+                }
+            }
+
+            options.push(correctAnswer);
+            shuffle(options);
+
+            return options;
+        }
+
+        function generateQuiz() {
+            const quizContainer = document.getElementById('quiz');
+            const answersContainer = document.getElementById('answers');
+            const resultContainer = document.getElementById('result');
+            quizContainer.innerHTML = '';
+            answersContainer.innerHTML = ''; // Clear previous answers on reload
+            resultContainer.innerHTML = ''; // Clear result on reload
+            userAnswers = []; // Clear previous answers
+
+            const questionTypes = ['説明の答えを選ぶ', '名称の説明を選ぶ'];
+            const questionsPerType = 5; // 各タイプ5問
+            let quizHtml = '';
+
+            for (let i = 0; i < questionTypes.length; i++) {
+                const questionType = questionTypes[i];
+                const questionsList = getRandomQuestions(questionsPerType);
+
+                questionsList.forEach((q, index) => {
+                    let questionText, correctAnswer, optionType;
+                    if (questionType === '説明の答えを選ぶ') {
+                        questionText = `${q.japanese}の名称は？`;
+                        correctAnswer = q.word;
+                        optionType = 'japanese';
+                    } else {
+                        questionText = `${q.word}の説明は？`;
+                        correctAnswer = q.japanese;
+                        optionType = 'english';
+                    }
+
+                    const options = generateOptions(correctAnswer, questions, optionType);
+
+                    quizHtml += `<div class="question">
+                                    <h3>問題 ${i * questionsPerType + index + 1}: ${questionType}</h3>
+                                    <div class="question-options">
+                                        <p>${questionText}</p>`;
+
+                    options.forEach(option => {
+                        quizHtml += `<label>
+                                        <span class="feedback-indicator"></span>
+                                        <input type="radio" name="q${i * questionsPerType + index + 1}" value="${option}"> ${option}
+                                      </label>`;
+                        
+                        // Track answer stats
+                        if (!answerStats[option]) {
+                            answerStats[option] = { total: 0, correct: 0 };
+                        }
+                        answerStats[option].total++;
+                    });
+
+                    quizHtml += `</div></div>`;
+
+                    userAnswers.push({ question: `${questionText}`, correctAnswer, questionType, index: i * questionsPerType + index + 1 });
+                });
+            }
+
+            quizContainer.innerHTML = quizHtml;
+        }
+
+        function showAnswers() {
+            const answersContainer = document.getElementById('answers');
+            const resultContainer = document.getElementById('result');
+            answersContainer.innerHTML = '';
+            resultContainer.innerHTML = '';
+            let correctCount = 0;
+            const totalQuestions = userAnswers.length;
+
+            userAnswers.forEach(item => {
+                const selectedOption = document.querySelector(`input[name="q${item.index}"]:checked`);
+                const userAnswer = selectedOption ? selectedOption.value : '未選択';
+
+                const feedbackClass = userAnswer === item.correctAnswer ? 'correct' : 'incorrect';
+                if (userAnswer === item.correctAnswer) correctCount++;
+
+                answersContainer.innerHTML += `<p>問題 ${item.index}: ${item.questionType}の答えは「${item.correctAnswer}」 (${getAnswerRate(item.correctAnswer)}%)。あなたの選択: 「${userAnswer}」 <span class="${feedbackClass}">${userAnswer === item.correctAnswer ? '〇' : '×'}</span> <a href="#" onclick="showQuestion(${item.index})">(質問を表示)</a></p>`;
+
+                // Add feedback to radio buttons
+                const labels = document.querySelectorAll(`input[name="q${item.index}"]`);
+                labels.forEach(label => {
+                    const labelElement = label.parentNode;
+                    if (label.checked) {
+                        labelElement.classList.add(userAnswer === item.correctAnswer ? 'correct-option' : 'incorrect-option');
+                    } else {
+                        labelElement.classList.add(label.value === item.correctAnswer ? 'correct-option' : 'incorrect-option');
+                    }
+                });
+
+                // Update answer stats
+                if (userAnswer === item.correctAnswer) {
+                    answerStats[item.correctAnswer].correct++;
+                }
+                difficultyMap[item.correctAnswer] = (difficultyMap[item.correctAnswer] || 1) + (userAnswer === item.correctAnswer ? 0 : 1);
+            });
+
+            const correctRate = ((correctCount / totalQuestions) * 100).toFixed(2);
+            resultContainer.innerHTML = `得点率: ${correctRate}%`;
+            resultContainer.style.display = 'block';
+            answersContainer.style.display = 'block';
+        }
+
+        function getAnswerRate(answer) {
+            const stats = answerStats[answer] || { total: 1, correct: 0 };
+            return ((stats.correct / stats.total) * 100).toFixed(2);
+        }
+
+        function showQuestion(index) {
+            const questions = document.querySelectorAll('.question');
+            questions.forEach((q, i) => {
+                if (i === index - 1) {
+                    q.style.display = 'block';
+                } else {
+                    q.style.display = 'none';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', generateQuiz);
+    </script>
+</body>
+</html>
