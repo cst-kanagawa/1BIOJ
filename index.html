@@ -190,11 +190,11 @@
                 questionsList.forEach((q, index) => {
                     let questionText, correctAnswer, optionType;
                     if (questionType === '説明の答えを選ぶ') {
-                        questionText = `「${q.japanese}`」;
+                        questionText = `${q.japanese}`;
                         correctAnswer = q.word;
                         optionType = 'japanese';
                     } else {
-                        questionText = `「${q.word}」の説明もしくは、空欄に入れると完成する文章はは？`;
+                        questionText = `${q.word}　　の説明もしくは、空欄に入れると完成する文章はは？`;
                         correctAnswer = q.japanese;
                         optionType = 'english';
                     }
